@@ -17,7 +17,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 
 const ProductCard = ({ product, setIdsDelete, idsDelete }) => {
-  console.log(setIdsDelete, idsDelete, product);
+  // console.log(setIdsDelete, idsDelete, product);
   const [checked, setChecked] = useState(false);
 
   const handleCheckBox = (checked, product) => {
@@ -33,7 +33,7 @@ const ProductCard = ({ product, setIdsDelete, idsDelete }) => {
 
   return (
     <View style={styles.card}>
-      {/* <Image source={{ uri: product.image }} style={styles.image} /> */}
+      <Image source={{ uri: product.url }} style={styles.image} />
       <View style={styles.details}>
         <Text style={[styles.name, styles.textStyle]}>{product.name}</Text>
         <Text style={[styles.info, styles.textStyle]}>
@@ -61,9 +61,21 @@ const RemoveProducts = () => {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
 
-  const SubmitBooking = () => {
+  const SubmitBooking = async () => {
     console.log("Submitted");
     console.log(idsDelete);
+    axios
+      .delete(`https://store-app-vykv.onrender.com/products/${idsDelete[0]}`)
+      .then((response) => {
+        console.log(response);
+        alert("Product Deleted Successfully");
+        router.replace("/(tabs)/home");
+      })
+      .catch((error) => {
+        console.log(error);
+        alert(error);
+        router.replace("/(tabs)/home");
+      });
   };
 
   const getProducts = async () => {
@@ -73,15 +85,14 @@ const RemoveProducts = () => {
       setLoading(true);
       const orgIdToPass = orgId;
       const bearerToken = token;
+      console.log("orgid tokennnn.....", orgId, token);
       const response = await axios.get(
-        `http://192.168.6.164:8001/products/orgId/${orgIdToPass}`,
-        {
-          headers: {
-            authorization: `Bearer ${bearerToken}`,
-          },
-        }
+        `https://store-app-vykv.onrender.com/products/orgId/${orgIdToPass}`
       );
+      // console
+      console.log(response);
       setProducts(response.data.Products);
+      setLoading(false);
     } catch (error) {
       console.log(error);
       if (error.response !== undefined) {
@@ -188,7 +199,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#BBF7D0",
+    backgroundColor: "#eee",
     padding: 16,
     borderRadius: 8,
     marginBottom: 10,
@@ -200,8 +211,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   image: {
-    width: 50,
-    height: 50,
+    width: 80,
+    height: 80,
     borderRadius: 8,
     marginRight: 10,
   },

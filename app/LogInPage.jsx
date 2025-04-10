@@ -15,13 +15,14 @@ import { useRouter } from "expo-router";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { setOrgIdAndToken, setOrg } from "../features/Auth";
+import { setOrgIdUserIdToken, setOrg } from "../features/Auth";
 import { Dimensions } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
 export default function AuthScreen() {
-  console.log(setOrgIdAndToken);
+  console.log(setOrgIdUserIdToken);
   const [isOrg, setIsOrg] = useState(false);
   const [isUser, setIsUser] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -44,61 +45,100 @@ export default function AuthScreen() {
     setIsOrg(false);
   };
 
+  const storeData = async (value) => {
+    try {
+      console.log("valueeeee", value);
+      await AsyncStorage.setItem("token", value.token);
+      await AsyncStorage.setItem("orgId", value.organisationId);
+      await AsyncStorage.setItem("userId", value.user);
+    } catch (e) {
+      alert(e);
+    }
+  };
+
   const LoginUser = async (data) => {
     console.log(data);
-    // axios
-    //   .post("http://192.168.6.164:8001/auth/user/login", data)
-    //   .then((response) => {
-    //     // console.log(response);
-    //     console.log(response.data.user.orgId);
-    //     console.log(response.data.token);
-    //     // setOrgId(response.data.user.orgId, response.data.token);
-    //     // setTimeout(() => {}, 5000);
-    //     // console.log(orgId, token);
-    //     router.push("/(tabs)");
-    //   })
-    //   .catch((error) => {
-    //     if (error.response !== undefined) {
-    //       alert(error.response.data.message);
-    //     } else if (error.message == "Network Error") {
-    //       alert("Server Issue Please Try After Some Time");
-    //     } else {
-    //       alert(error);
-    //     }
-    //   });
-    dispatch(
-      setOrgIdAndToken({ orgId: "A5FC1", token: "dfvdvndjvnsdernsmaKDJ" })
-    );
-    router.replace("/(tabs)/home");
+    setLoading(true);
+    axios
+      .post("https://store-app-vykv.onrender.com/auth/user/login", data)
+      .then((response) => {
+        console.log(response);
+        console.log(response.data.user.orgId);
+        console.log(response.data.token);
+        const access_token = response.data.token;
+        const user = response.data.user.id;
+        const organisationId = response.data.user.orgId;
+        // localStorage.setItem("token", access_token);
+        // localStorage.setItem("userId", user);
+        // localStorage.setItem("organisationId", organisationId);
+        storeData({
+          token: access_token,
+          organisationId: organisationId,
+          user: user,
+        });
+        dispatch(
+          setOrgIdUserIdToken({
+            orgId: response.data.user.orgId,
+            userId: response.data.user.id,
+            token: response.data.token,
+          })
+        );
+        router.push("/(tabs)/home");
+      })
+      .catch((error) => {
+        if (error.response !== undefined) {
+          alert(error.response.data.message);
+        } else if (error.message == "Network Error") {
+          alert("Server Issue Please Try After Some Time");
+        } else {
+          alert(error);
+        }
+      });
+    setLoading(false);
   };
 
   const LoginOrg = async (data) => {
     setLoading(true);
     console.log(data);
     console.log(setOrg);
-    dispatch(setOrg());
-    router.replace("/(tabs)/home");
+    // router.replace("/(tabs)/home");
 
-    // axios
-    //   .post("http://192.168.6.164:8001/auth/org/login", data)
-    //   .then((response) => {
-    //     // console.log(response);
-    //     console.log(response.data.user.orgId);
-    //     console.log(response.data.token);
-    //     // setOrgId(response.data.user.orgId, response.data.token);
-    //     // setTimeout(() => {}, 5000);
-    //     // console.log(orgId, token);
-    //     router.push("/(tabs)");
-    //   })
-    //   .catch((error) => {
-    //     if (error.response !== undefined) {
-    //       alert(error.response.data.message);
-    //     } else if (error.message == "Network Error") {
-    //       alert("Server Issue Please Try After Some Time");
-    //     } else {
-    //       alert(error);
-    //     }
-    //   });
+    axios
+      .post("https://store-app-vykv.onrender.com/auth/org/login", data)
+      .then((response) => {
+        // console.log(response);
+        console.log(response.data.user.orgId);
+        console.log(response.data.token);
+        const access_token = response.data.token;
+        const organisationId = response.data.user.orgId;
+        const user = "";
+        storeData({
+          token: access_token,
+          organisationId: organisationId,
+          user: user,
+        });
+        dispatch(setOrg());
+        dispatch(
+          setOrgIdUserIdToken({
+            orgId: response.data.user.orgId,
+            userId: "",
+            token: response.data.token,
+          })
+        );
+        // setOrgId(response.data.user.orgId, response.data.token);
+        // setTimeout(() => {}, 5000);
+        // console.log(orgId, token);
+        router.push("/(tabs)/home");
+      })
+      .catch((error) => {
+        if (error.response !== undefined) {
+          alert(error.response.data.message);
+        } else if (error.message == "Network Error") {
+          alert("Server Issue Please Try After Some Time");
+        } else {
+          alert(error);
+        }
+      });
 
     setLoading(false);
   };
@@ -183,7 +223,7 @@ export default function AuthScreen() {
         )}
         {/* Submit Button */}
         {loading ? (
-          <ActivityIndicator size="large" />
+          <ActivityIndicator size="large" color="#000" />
         ) : (
           <Pressable
             style={styles.button}

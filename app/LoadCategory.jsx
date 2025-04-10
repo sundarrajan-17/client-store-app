@@ -13,7 +13,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { isLoaded } from "expo-font";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 const products = [
   {
@@ -84,7 +84,10 @@ const ProductCard = ({ product, count, increment, decrement }) => {
   );
 };
 
-const Products = () => {
+const Products = ({ route }) => {
+  //   const { categoryName } = route.params;
+  const categoryName = useLocalSearchParams();
+  console.log(categoryName);
   const router = useRouter();
   const orgId = useSelector((state) => state.auth.orgId);
   const userId = useSelector((state) => state.auth.userId);
@@ -123,10 +126,11 @@ const Products = () => {
       // console
       console.log(response);
       const filteredProducts = response.data.Products.filter(
-        (product) => product.category === "Propulsion System"
+        (product) => product.category === categoryName.name
       );
       console.log(filteredProducts);
-      setProducts(response.data.Products);
+      // setProducts(response.data.Products);
+      setProducts(filteredProducts);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -182,31 +186,6 @@ const Products = () => {
     }, 2000);
   }, []);
 
-  // const getHeader = () => {
-  //   return (
-  //     <View
-  //       style={{
-  //         flexDirection: "row",
-  //         alignItems: "center",
-  //         justifyContent: "space-between",
-  //       }}
-  //     >
-  //       <Text
-  //         style={[
-  //           styles.info,
-  //           styles.textStyle,
-  //           { fontSize: 30, paddingLeft: 20, fontWeight: 700 },
-  //         ]}
-  //       >
-  //         Products
-  //       </Text>
-  //       <Pressable onPress={onRefresh} style={{ paddingRight: 14 }}>
-  //         <Feather name="refresh-cw" size={24} color="black" />
-  //       </Pressable>
-  //     </View>
-  //   );
-  // };
-
   const getFooter = () => {
     return (
       <Pressable
@@ -244,7 +223,6 @@ const Products = () => {
               />
             )}
             contentContainerStyle={styles.listContainer}
-            // ListHeaderComponent={getHeader}
             ListFooterComponent={getFooter}
             scrollEnabled={false}
           />

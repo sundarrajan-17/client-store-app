@@ -4,24 +4,24 @@ const initialState = {
   loginStatus: false,
   isOrg: false,
   orgId: "",
+  databaseId: "",
   token: "",
+  userId: "",
 };
 
 export const authSlice = createSlice({
   name: "auth",
   initialState: initialState,
   reducers: {
-    getLoginStatus: (state) => {
-      return state.loginStatus;
-    },
     sendLogInData: (state, action) => {
       console.log(action);
       state.loginStatus = true;
     },
-    setOrgIdAndToken: (state, action) => {
+    setOrgIdUserIdToken: (state, action) => {
       console.log(action);
       state.orgId = action.payload.orgId;
       state.token = action.payload.token;
+      state.userId = action.payload.userId;
     },
     setOrg: (state) => {
       state.isOrg = true;
@@ -30,7 +30,6 @@ export const authSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { getLoginStatus, sendLogInData, setOrgIdAndToken, setOrg } =
-  authSlice.actions;
+export const { sendLogInData, setOrgIdUserIdToken, setOrg } = authSlice.actions;
 
 export default authSlice.reducer;

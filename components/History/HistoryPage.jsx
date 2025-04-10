@@ -113,7 +113,7 @@ const History = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "#bbb",
+    // backgroundColor: "#BBF7D0",
     // padding: 16,
   },
   title: {
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#BBF7D0",
+    backgroundColor: "#eee",
     padding: 16,
     borderRadius: 8,
     marginBottom: 10,

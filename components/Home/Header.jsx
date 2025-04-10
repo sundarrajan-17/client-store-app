@@ -28,7 +28,7 @@ export default function Header() {
         />
         <View className="gap-3">
           <Text className="font-bold text-3xl ">Welcome To</Text>
-          <Text className="font-bold text-3xl">CASR STORE,</Text>
+          <Text className="font-bold text-3xl">CASR STORE</Text>
         </View>
       </View>
       <View className="flex flex-row items-center p-2 rounded-2xl bg-white m-4 pl-6 mt-10">

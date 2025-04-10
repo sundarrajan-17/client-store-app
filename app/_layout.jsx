@@ -1,6 +1,7 @@
 import React from "react";
 import { Stack } from "expo-router";
 import { Provider } from "react-redux";
+import { SafeAreaView } from "react-native";
 import store from "../store/store";
 import "../global.css";
 
@@ -22,7 +23,7 @@ export default function StackLayout() {
           name="BookProducts"
           options={{
             headerShown: true,
-            title: "Book Products",
+            title: "Products",
             headerStyle: {
               backgroundColor: "#BBF7D0",
             },
@@ -63,6 +64,16 @@ export default function StackLayout() {
           options={{
             headerShown: true,
             title: "Remove Products",
+            headerStyle: {
+              backgroundColor: "#BBF7D0",
+            },
+          }}
+        />
+        <Stack.Screen
+          name="LoadCategory"
+          options={{
+            headerShown: true,
+            title: "Products",
             headerStyle: {
               backgroundColor: "#BBF7D0",
             },

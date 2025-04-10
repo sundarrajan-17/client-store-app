@@ -1,4 +1,4 @@
-import { View, Image, Text } from "react-native";
+import { View, Image, Text, Button } from "react-native";
 import React from "react";
 import Carousel from "react-native-reanimated-carousel";
 import Image1 from "../../assets/images/sliderimage1.jpg";
@@ -6,6 +6,7 @@ import Image2 from "../../assets/images/sliderimage2.jpg";
 import Image3 from "../../assets/images/sliderimage3.jpg";
 import Image4 from "../../assets/images/poster.jpg";
 import { Dimensions } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -17,6 +18,16 @@ const carouselData = [
 ];
 
 export default function Slider() {
+  const handlePress = async () => {
+    try {
+      await AsyncStorage.clear();
+      console.log(AsyncStorage.getItem("token"));
+      // console.log('✅ AsyncStorage cleared!');
+    } catch (e) {
+      // console.error('❌ Error clearing storage:', e);
+      alert(e);
+    }
+  };
   return (
     <View>
       {/* <View className="p-4">
@@ -56,6 +67,7 @@ export default function Slider() {
         }}
         style={{ marginTop: -40 }}
       />
+      {/* <Button title="click to clear Storage" onPress={handlePress} /> */}
     </View>
   );
 }

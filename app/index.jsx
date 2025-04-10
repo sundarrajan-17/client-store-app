@@ -1,15 +1,30 @@
-import { View, Text } from "react-native";
-import React from "react";
+import { ActivityIndicator } from "react-native";
+import React, { useEffect, useState } from "react";
 import { Redirect, useRouter } from "expo-router";
-import { useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function IndexScreen() {
   const router = useRouter();
-  const loginstatus = useSelector((state) => state.auth.loginstatus);
-  console.log(loginstatus);
+  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState("");
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("token");
+      console.log(jsonValue);
+      setToken(jsonValue);
+      setLoading(false);
+    } catch (e) {
+      alert(e);
+    }
+  };
+  useEffect(() => {
+    getData();
+  }, []);
   return (
     <>
-      {loginstatus ? (
+      {loading ? (
+        <ActivityIndicator size="large" />
+      ) : token !== null ? (
         <Redirect href="/(tabs)/home" />
       ) : (
         <Redirect href="/LogInPage" />

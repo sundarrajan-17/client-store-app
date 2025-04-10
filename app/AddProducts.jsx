@@ -7,10 +7,13 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Button,
+  Image,
 } from "react-native";
 import { useRouter } from "expo-router";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import * as ImagePicker from "expo-image-picker";
 
 const AddProducts = () => {
   const router = useRouter();
@@ -19,12 +22,19 @@ const AddProducts = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const [image, setImage] = useState(null);
+
   const [product, setProduct] = useState({
     name: "",
-    quantity: "",
+    quantity: 0,
     description: "",
     orgId: orgId,
     category: "",
+    image: {
+      name: "",
+      uri: "",
+      type: "",
+    },
   });
 
   const [errors, setErrors] = useState({});
@@ -32,52 +42,96 @@ const AddProducts = () => {
   const validate = () => {
     const newErrors = {};
     if (!product.name.trim()) newErrors.name = "Name is required";
-    if (!product.quantity.trim()) newErrors.quantity = "Quantity is required";
+    if (product.quantity === 0) newErrors.quantity = "Quantity is required";
     if (!product.description.trim())
       newErrors.description = "Description is required";
     if (!product.category.trim()) newErrors.category = "Category is required";
+    if (!product.image.uri.trim()) newErrors.image = "Image is required";
     setErrors(newErrors);
 
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validate()) {
-      Alert.alert("✅ Product Submitted", JSON.stringify(product, null, 2));
-    } else {
-      Alert.alert("⚠️ Please fill all required fields");
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images", "videos"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log("resultttt", result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      // console.log(result.assets[0].uri);
+      // console.log(result.assets[0].fileName);
+      // console.log(result.assets[0].fileName.split("."));
+      const filename = result.assets[0].uri.split("/").pop();
+      setProduct({
+        ...product,
+        image: {
+          name: filename,
+          uri: result.assets[0].uri,
+          type: result.assets[0].mimeType,
+        },
+      });
     }
   };
-
   // const { addProduct } = useProductStore();
 
   const handleAddProduct = async (newProduct) => {
-    console.log(newProduct);
+    console.log(typeof newProduct.name);
     if (validate()) {
       setLoading(true);
       // Alert.alert("✅ Product Submitted", JSON.stringify(product, null, 2));
 
-      await axios
-        .post("http://192.168.6.164:8001/products/create", newProduct, {
+      const formData = new FormData();
+      formData.append("name", newProduct.name);
+      formData.append("description", newProduct.description);
+      formData.append("category", newProduct.category);
+      formData.append("orgId", newProduct.orgId);
+      formData.append("quantity", newProduct.quantity);
+      formData.append("image", {
+        uri: newProduct.image.uri,
+        name: newProduct.image.name || "photo.jpg",
+        type: newProduct.image.type,
+      });
+      console.log(formData);
+
+      // Check contents
+      // for (let pair of formData.entries()) {
+      //   console.log(pair[0], pair[1]);
+      // }
+      // console.log(formData.entries());
+
+      axios
+        .post("https://store-app-vykv.onrender.com/products/create", formData, {
           headers: {
-            authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "multipart/form-data",
           },
         })
-        .then((response) => router.push("/SuccessScreen"))
+        .then((response) => {
+          console.log(response);
+          router.push("/(tabs)/home");
+        })
         .catch((error) => {
+          console.log(error);
           if (error.response !== undefined) {
             const errorReceived = error.response.data.message;
             if (errorReceived === "No token provided.")
               alert("Please LogIn First");
             else alert(error);
           } else if (error.message == "Network Error") {
+            setLoading(false);
             router.replace("/(tabs)/home");
             alert("Server Issue Please Try After Some Time");
-            setLoading(false);
           } else {
+            setLoading(false);
             router.replace("/(tabs)/home");
             alert(error);
-            setLoading(false);
           }
         });
     } else {
@@ -149,6 +203,11 @@ const AddProducts = () => {
           {errors.category && (
             <Text style={styles.error}>{errors.category}</Text>
           )}
+          {image && (
+            <Image source={{ uri: image }} className="w-[25%] h-[25%] m-4" />
+          )}
+          <Button title="Pick an image" onPress={pickImage} className="m-10" />
+          {errors.image && <Text style={styles.error}>{errors.image}</Text>}
           <Pressable
             style={styles.button}
             onPress={() => handleAddProduct(product)}
@@ -176,6 +235,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
+    margin: 4,
   },
   buttonText: { color: "white", fontWeight: "bold" },
   error: {
