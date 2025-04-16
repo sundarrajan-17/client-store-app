@@ -5,10 +5,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function IndexScreen() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [token, setToken] = useState("");
   const getData = async () => {
     try {
+      setLoading(true);
       const jsonValue = await AsyncStorage.getItem("token");
       console.log(jsonValue);
       setToken(jsonValue);

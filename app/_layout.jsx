@@ -79,6 +79,16 @@ export default function StackLayout() {
             },
           }}
         />
+        <Stack.Screen
+          name="Product"
+          options={{
+            headerShown: true,
+            title: "Products",
+            headerStyle: {
+              backgroundColor: "#BBF7D0",
+            },
+          }}
+        />
       </Stack>
     </Provider>
   );

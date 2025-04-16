@@ -9,9 +9,6 @@ import Category from "../../components/Home/Category";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function home() {
-  const [token, setToken] = useState("");
-  const [orgId, setOrgId] = useState("");
-  const [userId, setUserId] = useState("");
   const dispatch = useDispatch();
 
   const getData = async () => {
@@ -20,9 +17,6 @@ export default function home() {
       const getorgId = await AsyncStorage.getItem("orgId");
       const getuserId = await AsyncStorage.getItem("userId");
       console.log("hhhhhhhhhhhh", get_access_token, getorgId, getuserId);
-      // setToken(get_access_token);
-      // setOrgId(getorgId);
-      // setUserId(getuserId);
       console.log("setteddddddd");
       dispatch(
         setOrgIdUserIdToken({
