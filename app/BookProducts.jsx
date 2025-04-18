@@ -7,6 +7,7 @@ import {
   Pressable,
   Image,
   ScrollView,
+  TextInput,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Feather from "@expo/vector-icons/Feather";
@@ -95,6 +96,8 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [refreshing, setRefreshing] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [dupProducts, setDupProducts] = useState([]);
 
   const increment = (product) => {
     setCounts((prev) => ({
@@ -127,6 +130,7 @@ const Products = () => {
       );
       console.log(filteredProducts);
       setProducts(response.data.Products);
+      setDupProducts(response.data.Products);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -182,31 +186,6 @@ const Products = () => {
     }, 2000);
   }, []);
 
-  // const getHeader = () => {
-  //   return (
-  //     <View
-  //       style={{
-  //         flexDirection: "row",
-  //         alignItems: "center",
-  //         justifyContent: "space-between",
-  //       }}
-  //     >
-  //       <Text
-  //         style={[
-  //           styles.info,
-  //           styles.textStyle,
-  //           { fontSize: 30, paddingLeft: 20, fontWeight: 700 },
-  //         ]}
-  //       >
-  //         Products
-  //       </Text>
-  //       <Pressable onPress={onRefresh} style={{ paddingRight: 14 }}>
-  //         <Feather name="refresh-cw" size={24} color="black" />
-  //       </Pressable>
-  //     </View>
-  //   );
-  // };
-
   const getFooter = () => {
     return (
       <Pressable
@@ -232,6 +211,40 @@ const Products = () => {
           // }
           contentContainerStyle={{ paddingBottom: 60 }}
         >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              margin: 5,
+              padding: 13,
+              paddingBottom: 0,
+            }}
+          >
+            <TextInput
+              placeholder="Search products..."
+              value={search}
+              onChangeText={(text) => {
+                console.log(text);
+                setSearch(text);
+                if (text === "") {
+                  setProducts(dupProducts);
+                } else {
+                  setProducts((products) =>
+                    products.filter((product) => product.name.includes(text))
+                  );
+                }
+              }}
+              style={{
+                width: "100%",
+                height: "100%",
+                borderColor: "black",
+                borderWidth: 1,
+                borderRadius: 10,
+                padding: 15,
+              }}
+            />
+          </View>
           <FlatList
             data={products}
             keyExtractor={(item, index) => index.toString()}

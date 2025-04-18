@@ -9,6 +9,7 @@ export default function IndexScreen() {
   const [token, setToken] = useState("");
   const getData = async () => {
     try {
+      await AsyncStorage.clear();
       setLoading(true);
       const jsonValue = await AsyncStorage.getItem("token");
       console.log(jsonValue);
@@ -21,11 +22,10 @@ export default function IndexScreen() {
   useEffect(() => {
     getData();
   }, []);
+  console.log("tokennnnn", token);
   return (
     <>
-      {loading ? (
-        <ActivityIndicator size="large" />
-      ) : token !== null ? (
+      {token !== "" && token !== null ? (
         <Redirect href="/(tabs)/home" />
       ) : (
         <Redirect href="/LogInPage" />
