@@ -121,16 +121,21 @@ const Products = ({ route }) => {
       const bearerToken = token;
       console.log("orgid tokennnn.....", orgId, token, userId);
       const response = await axios.get(
-        `https://store-app-vykv.onrender.com/products/orgId/${orgIdToPass}`
+        `https://store-app-vykv.onrender.com/request?category=${categoryName.name}&name=`,
+        {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        }
       );
       // console
       console.log(response);
-      const filteredProducts = response.data.Products.filter(
-        (product) => product.category === categoryName.name
-      );
-      console.log(filteredProducts);
+      // const filteredProducts = response.data.Products.filter(
+      //   (product) => product.category === categoryName.name
+      // );
+      // console.log(filteredProducts);
       // setProducts(response.data.Products);
-      setProducts(filteredProducts);
+      setProducts(response.data.products);
       setLoading(false);
     } catch (error) {
       console.log(error);

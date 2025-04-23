@@ -7,6 +7,7 @@ const initialState = {
   databaseId: "",
   token: "",
   userId: "",
+  userName: "",
 };
 
 export const authSlice = createSlice({
@@ -22,9 +23,8 @@ export const authSlice = createSlice({
       state.orgId = action.payload.orgId;
       state.token = action.payload.token;
       state.userId = action.payload.userId;
-    },
-    setOrg: (state) => {
-      state.isOrg = true;
+      state.userName = action.payload.userName;
+      state.isOrg = action.payload.isOrg;
     },
   },
 });

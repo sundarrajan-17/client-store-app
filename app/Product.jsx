@@ -32,7 +32,7 @@ const ProductsUpdation = () => {
     name: productupdate.name,
     quantity: productupdate.quantity,
     description: productupdate.description,
-    orgId: productupdate.orgId,
+    // orgId: productupdate.orgId,
     category: productupdate.category,
   });
 
@@ -59,61 +59,48 @@ const ProductsUpdation = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+  // const pickImage = async () => {
+  //   // No permissions request is necessary for launching the image library
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ["images", "videos"],
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
 
-    console.log("resultttt", result);
+  //   console.log("resultttt", result);
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      // console.log(result.assets[0].uri);
-      // console.log(result.assets[0].fileName);
-      // console.log(result.assets[0].fileName.split("."));
-      const filename = result.assets[0].uri.split("/").pop();
-      setProduct({
-        ...product,
-        image: {
-          name: filename,
-          uri: result.assets[0].uri,
-          type: result.assets[0].mimeType,
-        },
-      });
-    }
-  };
+  //   if (!result.canceled) {
+  //     setImage(result.assets[0].uri);
+  //     // console.log(result.assets[0].uri);
+  //     // console.log(result.assets[0].fileName);
+  //     // console.log(result.assets[0].fileName.split("."));
+  //     const filename = result.assets[0].uri.split("/").pop();
+  //     setProduct({
+  //       ...product,
+  //       image: {
+  //         name: filename,
+  //         uri: result.assets[0].uri,
+  //         type: result.assets[0].mimeType,
+  //       },
+  //     });
+  //   }
+  // };
   // const { addProduct } = useProductStore();
 
-  const handleAddProduct = async (newProduct) => {
-    console.log(typeof newProduct.name);
+  const handleAddProduct = async () => {
     if (validate()) {
       setLoading(true);
-      // Alert.alert("✅ Product Submitted", JSON.stringify(product, null, 2));
-
-      const formData = new FormData();
-      formData.append("name", newProduct.name);
-      formData.append("description", newProduct.description);
-      formData.append("category", newProduct.category);
-      formData.append("orgId", newProduct.orgId);
-      formData.append("quantity", newProduct.quantity);
-      formData.append("image", {
-        uri: newProduct.image.uri,
-        name: newProduct.image.name || "photo.jpg",
-        type: newProduct.image.type,
-      });
-      console.log(formData);
-
       axios
-        .post("https://store-app-vykv.onrender.com/products/create", formData, {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "multipart/form-data",
-          },
-        })
+        .patch(
+          `https://store-app-vykv.onrender.com/products/${productupdate._id}`,
+          product,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
         .then((response) => {
           console.log(response);
           router.push("/(tabs)/home");

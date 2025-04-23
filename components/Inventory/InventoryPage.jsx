@@ -15,14 +15,14 @@ export default function InventoryPage({ isOrg }) {
           <Text className="text-center font-semibold text-xl">Book</Text>
         </View>
       </Pressable>
-      <Pressable
+      {/* <Pressable
         onPress={() => router.push("/ReturnProducts")}
         className="bg-green-200 p-5 rounded-2xl border-l-2 border-r-2 border-gray-400"
       >
         <View>
           <Text className="text-center font-semibold text-xl">Return</Text>
         </View>
-      </Pressable>
+      </Pressable> */}
       <Pressable
         onPress={() => router.push("/(tabs)/history")}
         className="bg-green-200 p-5 rounded-2xl border-l-2 border-r-2 border-gray-400"
@@ -49,14 +49,14 @@ export default function InventoryPage({ isOrg }) {
               <Text className="text-center font-semibold text-xl">Update</Text>
             </View>
           </Pressable>
-          <Pressable
+          {/* <Pressable
             onPress={() => router.push("/RemoveProducts")}
             className="bg-green-200 p-5 rounded-2xl border-l-2 border-r-2 border-gray-400"
           >
             <View>
               <Text className="text-center font-semibold text-xl">Remove</Text>
             </View>
-          </Pressable>
+          </Pressable> */}
         </>
       )}
     </View>

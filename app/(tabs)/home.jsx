@@ -30,7 +30,7 @@ export default function home() {
     }
   };
   useEffect(() => {
-    getData();
+    // getData();
   }, []);
   return (
     <ScrollView>

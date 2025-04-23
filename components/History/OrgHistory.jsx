@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, FlatList, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  StyleSheet,
+  Pressable,
+} from "react-native";
 import PropImage from "../../assets/images/propeller.jpg";
 import MotorImage from "../../assets/images/motor.jpg";
 import Battery4s from "../../assets/images/battery-4s.jpg";
@@ -88,7 +95,7 @@ const purchasedProducts = [
   },
 ];
 
-const History = () => {
+const OrgHistory = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const token = useSelector((state) => state.auth.token);
@@ -128,25 +135,32 @@ const History = () => {
   };
 
   useEffect(() => {
-    getProducts();
+    // getProducts();
   }, []);
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={products}
+        data={purchasedProducts}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View
             style={styles.card}
             className="border-l-2 border-r-2 border-gray-400 p-5"
           >
-            <Image source={item.productId.url} style={styles.image} />
+            <Image source={item.image} style={styles.image} />
             <View style={styles.details}>
-              <Text style={styles.name}>{item.productId.name}</Text>
-              <Text style={styles.info}>Quantity: {item.quantity}</Text>
-              <Text style={styles.date}>{item.productId.createdAt}</Text>
-              <Text style={styles.date}>Status: {item.status}</Text>
+              <View>
+                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.info}>Quantity: {item.quantity}</Text>
+                <Text style={styles.date}>{item.date}</Text>
+                {/* <Text style={styles.date}>Status: {item.status}</Text> */}
+              </View>
+              <View>
+                <Pressable onClick={() => console.log(pressed)}>
+                  <Text>Update Status</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
         )}
@@ -205,4 +219,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default History;
+export default OrgHistory;

@@ -1,34 +1,69 @@
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Redirect, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setOrgIdUserIdToken } from "@/features/Auth";
 
 export default function IndexScreen() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState("");
-  const getData = async () => {
+  const [loading, setLoading] = useState(true);
+  const [valid, setValid] = useState(false);
+  const dispatch = useDispatch();
+  const verifyToken = async () => {
     try {
-      await AsyncStorage.clear();
       setLoading(true);
-      const jsonValue = await AsyncStorage.getItem("token");
-      console.log(jsonValue);
-      setToken(jsonValue);
-      setLoading(false);
+      const access_token = await AsyncStorage.getItem("token");
+      const getorgId = await AsyncStorage.getItem("orgId");
+      const getuserId = await AsyncStorage.getItem("userId");
+      const userName = await AsyncStorage.getItem("userName");
+      const isOrg = await AsyncStorage.getItem("isOrg");
+      if (access_token) {
+        const body = { token: access_token };
+        console.log("jsonValueeeeee", { token: access_token });
+        axios
+          .post("https://store-app-vykv.onrender.com/verifyJWT", body)
+          .then((response) => {
+            console.log(response.data.isValid);
+            dispatch(
+              setOrgIdUserIdToken({
+                token: access_token,
+                orgId: getorgId,
+                userId: getuserId,
+                userName: userName,
+                isOrg: isOrg,
+              })
+            );
+            setValid(response.data.isValid);
+            setLoading(false);
+          })
+          .catch((error) => console.log(error));
+      }
     } catch (e) {
       alert(e);
     }
   };
   useEffect(() => {
-    getData();
+    verifyToken();
   }, []);
-  console.log("tokennnnn", token);
+  // console.log("tokennnnn", token);
   return (
     <>
-      {token !== "" && token !== null ? (
-        <Redirect href="/(tabs)/home" />
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color="black"
+          style={{ flex: 1, justifyContent: "center" }}
+        />
       ) : (
-        <Redirect href="/LogInPage" />
+        <>
+          {valid ? (
+            <Redirect href="/(tabs)/home" />
+          ) : (
+            <Redirect href="/LogInPage" />
+          )}
+        </>
       )}
     </>
   );

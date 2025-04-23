@@ -44,7 +44,16 @@ const ProductCard = ({ product, count, increment, decrement }) => {
       <View style={styles.details}>
         <Text style={[styles.name, styles.textStyle]}>{product.name}</Text>
         <Text style={[styles.info, styles.textStyle]}>
-          Available: {product.quantity}
+          Available:{" "}
+          {product.quantity === 0 ? (
+            <Text style={[styles.outofstock, styles.textStyle]}>
+              Out Of Stock
+            </Text>
+          ) : (
+            <Text style={[styles.info, styles.textStyle]}>
+              {product.quantity}
+            </Text>
+          )}
         </Text>
         <Text style={[styles.info, styles.textStyle]}>
           Category: {product.category}
@@ -55,31 +64,37 @@ const ProductCard = ({ product, count, increment, decrement }) => {
           </Text>
         )}
       </View>
-      {count === 0 ? (
-        // Add Button
-        <Pressable
-          style={[styles.addButton]}
-          onPress={() => increment(product)}
-        >
-          <Text style={styles.addButtonText}>Add</Text>
-        </Pressable>
+      {product.quantity === 0 ? (
+        <></>
       ) : (
-        // Counter Buttons
-        <View style={styles.counterContainer}>
-          <Pressable
-            onPress={() => decrement(product)}
-            style={styles.counterButton}
-          >
-            <Text style={styles.counterText}>-</Text>
-          </Pressable>
-          <Text style={[styles.counterText]}>{count}</Text>
-          <Pressable
-            onPress={() => increment(product)}
-            style={styles.counterButton}
-          >
-            <Text style={styles.counterText}>+</Text>
-          </Pressable>
-        </View>
+        <>
+          {count === 0 ? (
+            // Add Button
+            <Pressable
+              style={[styles.addButton]}
+              onPress={() => increment(product)}
+            >
+              <Text style={styles.addButtonText}>Add</Text>
+            </Pressable>
+          ) : (
+            // Counter Buttons
+            <View style={styles.counterContainer}>
+              <Pressable
+                onPress={() => decrement(product)}
+                style={styles.counterButton}
+              >
+                <Text style={styles.counterText}>-</Text>
+              </Pressable>
+              <Text style={[styles.counterText]}>{count}</Text>
+              <Pressable
+                onPress={() => increment(product)}
+                style={styles.counterButton}
+              >
+                <Text style={styles.counterText}>+</Text>
+              </Pressable>
+            </View>
+          )}
+        </>
       )}
     </Pressable>
   );
@@ -94,10 +109,11 @@ const Products = () => {
 
   const [counts, setCounts] = useState({});
   const [products, setProducts] = useState([]);
+  const [searchProducts, setSearchProducts] = useState([]);
   const [refreshing, setRefreshing] = useState(true);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-  const [dupProducts, setDupProducts] = useState([]);
+  const [submit, setSubmit] = useState(false);
 
   const increment = (product) => {
     setCounts((prev) => ({
@@ -121,16 +137,16 @@ const Products = () => {
       const bearerToken = token;
       console.log("orgid tokennnn.....", orgId, token, userId);
       const response = await axios.get(
-        `https://store-app-vykv.onrender.com/products/orgId/${orgIdToPass}`
+        `https://store-app-vykv.onrender.com/products/orgId/`,
+        {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        }
       );
       // console
       console.log(response);
-      const filteredProducts = response.data.Products.filter(
-        (product) => product.category === "Propulsion System"
-      );
-      console.log(filteredProducts);
       setProducts(response.data.Products);
-      setDupProducts(response.data.Products);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -157,25 +173,60 @@ const Products = () => {
   const SubmitBooking = async () => {
     console.log("Submitted");
     console.log(counts);
-    const productsBook = Object.entries(counts).map(([key, value]) => ({
-      productId: key,
-      quantity: value,
-      userId: userId,
-    }));
-    console.log(productsBook);
+    const bearerToken = token;
     axios
-      .post(
-        "https://store-app-vykv.onrender.com/products/request",
-        productsBook[0]
-      )
+      .post("https://store-app-vykv.onrender.com/request", productsBook[0], {
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      })
       .then((response) => {
         console.log(response.data);
-        router.replace("/(tabs)/home");
+        router.push("/(tabs)/home");
       })
       .catch((error) => {
         console.log(error);
         alert(error);
       });
+  };
+
+  const submitSearch = async () => {
+    if (search === "") {
+      setSubmit(false);
+    } else {
+      try {
+        setSubmit(true);
+        const orgIdToPass = orgId;
+        const bearerToken = token;
+        console.log("orgid tokennnn.....", orgId, token, userId);
+        const response = await axios.get(
+          `https://store-app-vykv.onrender.com/request?category=&name=${search}`,
+          {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+            },
+          }
+        );
+        console.log(response);
+        setSearchProducts(response.data.products);
+      } catch (error) {
+        console.log(error);
+        if (error.response !== undefined) {
+          const errorReceived = error.response.data.message;
+          if (errorReceived === "No token provided.")
+            alert("Please LogIn First");
+          else alert(error);
+        } else if (error.message == "Network Error") {
+          router.replace("/(tabs)/home");
+          alert("Server Issue Please Try After Some Time");
+          setSubmit(false);
+        } else {
+          router.replace("/(tabs)/home");
+          alert(error);
+          setSubmit(false);
+        }
+      }
+    }
   };
 
   const onRefresh = React.useCallback(() => {
@@ -227,14 +278,15 @@ const Products = () => {
               onChangeText={(text) => {
                 console.log(text);
                 setSearch(text);
-                if (text === "") {
-                  setProducts(dupProducts);
-                } else {
-                  setProducts((products) =>
-                    products.filter((product) => product.name.includes(text))
-                  );
-                }
+                // if (text === "") {
+                //   setProducts(dupProducts);
+                // } else {
+                //   setProducts((products) =>
+                //     products.filter((product) => product.name.includes(text))
+                //   );
+                // }
               }}
+              onSubmitEditing={() => submitSearch()}
               style={{
                 width: "100%",
                 height: "100%",
@@ -245,22 +297,41 @@ const Products = () => {
               }}
             />
           </View>
-          <FlatList
-            data={products}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <ProductCard
-                product={item}
-                count={counts[item._id] | 0}
-                increment={increment}
-                decrement={decrement}
-              />
-            )}
-            contentContainerStyle={styles.listContainer}
-            // ListHeaderComponent={getHeader}
-            ListFooterComponent={getFooter}
-            scrollEnabled={false}
-          />
+          {submit ? (
+            <FlatList
+              data={searchProducts}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <ProductCard
+                  product={item}
+                  count={counts[item._id] | 0}
+                  increment={increment}
+                  decrement={decrement}
+                />
+              )}
+              contentContainerStyle={styles.listContainer}
+              // ListHeaderComponent={getHeader}
+              ListFooterComponent={getFooter}
+              scrollEnabled={false}
+            />
+          ) : (
+            <FlatList
+              data={products}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <ProductCard
+                  product={item}
+                  count={counts[item._id] | 0}
+                  increment={increment}
+                  decrement={decrement}
+                />
+              )}
+              contentContainerStyle={styles.listContainer}
+              // ListHeaderComponent={getHeader}
+              ListFooterComponent={getFooter}
+              scrollEnabled={false}
+            />
+          )}
         </ScrollView>
       )}
     </>
@@ -302,6 +373,11 @@ const styles = StyleSheet.create({
   },
   info: {
     color: "#000",
+    fontSize: 17,
+    fontWeight: "semibold",
+  },
+  outofstock: {
+    color: "#ff0000",
     fontSize: 17,
     fontWeight: "semibold",
   },

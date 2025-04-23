@@ -51,6 +51,8 @@ export default function AuthScreen() {
       await AsyncStorage.setItem("token", value.token);
       await AsyncStorage.setItem("orgId", value.organisationId);
       await AsyncStorage.setItem("userId", value.user);
+      await AsyncStorage.setItem("userName", value.userName);
+      await AsyncStorage.setItem("isOrg", value.isOrg);
     } catch (e) {
       alert(e);
     }
@@ -63,24 +65,26 @@ export default function AuthScreen() {
       .post("https://store-app-vykv.onrender.com/auth/user/login", data)
       .then((response) => {
         console.log(response);
-        console.log(response.data.user.orgId);
-        console.log(response.data.token);
+        // console.log(response.data.user.orgId);
+        // console.log(response.data.token);
         const access_token = response.data.token;
         const user = response.data.user.id;
         const organisationId = response.data.user.orgId;
-        // localStorage.setItem("token", access_token);
-        // localStorage.setItem("userId", user);
-        // localStorage.setItem("organisationId", organisationId);
+        const userName = response.data.user.username;
         storeData({
           token: access_token,
           organisationId: organisationId,
           user: user,
+          userName: userName,
+          isOrg: false,
         });
         dispatch(
           setOrgIdUserIdToken({
-            orgId: response.data.user.orgId,
-            userId: response.data.user.id,
-            token: response.data.token,
+            orgId: organisationId,
+            userId: user,
+            token: access_token,
+            userName: userName,
+            isOrg: false,
           })
         );
         router.push("/(tabs)/home");
@@ -106,28 +110,29 @@ export default function AuthScreen() {
     axios
       .post("https://store-app-vykv.onrender.com/auth/org/login", data)
       .then((response) => {
-        // console.log(response);
-        console.log(response.data.user.orgId);
-        console.log(response.data.token);
+        console.log(response);
+        // console.log(response.data.user.orgId);
+        // console.log(response.data.token);
         const access_token = response.data.token;
         const organisationId = response.data.user.orgId;
-        const user = "";
+        const user = response.data.user.username;
+        const userId = response.data.user.id;
         storeData({
           token: access_token,
           organisationId: organisationId,
-          user: user,
+          user: userId,
+          userName: user,
+          isOrg: true,
         });
-        dispatch(setOrg());
         dispatch(
           setOrgIdUserIdToken({
             orgId: response.data.user.orgId,
             userId: "",
             token: response.data.token,
+            userName: user,
+            isOrg: true,
           })
         );
-        // setOrgId(response.data.user.orgId, response.data.token);
-        // setTimeout(() => {}, 5000);
-        // console.log(orgId, token);
         router.push("/(tabs)/home");
       })
       .catch((error) => {
