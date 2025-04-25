@@ -22,8 +22,6 @@ const ProductsUpdation = () => {
 
   const productupdate = useLocalSearchParams();
 
-  console.log(productupdate);
-
   const [loading, setLoading] = useState(false);
 
   const [image, setImage] = useState(null);
@@ -103,7 +101,8 @@ const ProductsUpdation = () => {
         )
         .then((response) => {
           console.log(response);
-          router.push("/(tabs)/home");
+          Alert.alert("Product Updated Successfully");
+          router.push("/(tabs)/");
         })
         .catch((error) => {
           console.log(error);
@@ -114,11 +113,11 @@ const ProductsUpdation = () => {
             else alert(error);
           } else if (error.message == "Network Error") {
             setLoading(false);
-            router.replace("/(tabs)/home");
+            router.replace("/(tabs)/");
             alert("Server Issue Please Try After Some Time");
           } else {
             setLoading(false);
-            router.replace("/(tabs)/home");
+            router.replace("/(tabs)/");
             alert(error);
           }
         });

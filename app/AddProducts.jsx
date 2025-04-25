@@ -111,14 +111,16 @@ const AddProducts = () => {
           headers: {
             Accept: "application/json",
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
           },
         })
         .then((response) => {
           console.log(response);
-          router.push("/(tabs)/home");
+          router.push("/(tabs)/");
         })
         .catch((error) => {
-          console.log(error);
+          console.log(error.response);
+          console.log(JSON.stringify(error, null, 2));
           if (error.response !== undefined) {
             const errorReceived = error.response.data.message;
             if (errorReceived === "No token provided.")
@@ -126,11 +128,11 @@ const AddProducts = () => {
             else alert(error);
           } else if (error.message == "Network Error") {
             setLoading(false);
-            router.replace("/(tabs)/home");
+            router.replace("/(tabs)/");
             alert("Server Issue Please Try After Some Time");
           } else {
             setLoading(false);
-            router.replace("/(tabs)/home");
+            router.replace("/(tabs)/");
             alert(error);
           }
         });

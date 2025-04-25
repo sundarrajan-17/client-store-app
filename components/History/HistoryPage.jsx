@@ -116,11 +116,11 @@ const History = () => {
         if (errorReceived === "No token provided.") alert("Please LogIn First");
         else alert(error);
       } else if (error.message == "Network Error") {
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
         alert("Server Issue Please Try After Some Time");
         setLoading(false);
       } else {
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
         alert(error);
         setLoading(false);
       }

@@ -76,7 +76,7 @@ export default function AuthScreen() {
           organisationId: organisationId,
           user: user,
           userName: userName,
-          isOrg: false,
+          isOrg: "false",
         });
         dispatch(
           setOrgIdUserIdToken({
@@ -87,7 +87,7 @@ export default function AuthScreen() {
             isOrg: false,
           })
         );
-        router.push("/(tabs)/home");
+        router.push("/(tabs)/");
       })
       .catch((error) => {
         if (error.response !== undefined) {
@@ -104,8 +104,9 @@ export default function AuthScreen() {
   const LoginOrg = async (data) => {
     setLoading(true);
     console.log(data);
-    console.log(setOrg);
-    // router.replace("/(tabs)/home");
+    // console.log(setOrg);
+    // router.replace("/(tabs)/");
+    console.log(loading);
 
     axios
       .post("https://store-app-vykv.onrender.com/auth/org/login", data)
@@ -122,7 +123,7 @@ export default function AuthScreen() {
           organisationId: organisationId,
           user: userId,
           userName: user,
-          isOrg: true,
+          isOrg: "true",
         });
         dispatch(
           setOrgIdUserIdToken({
@@ -133,9 +134,10 @@ export default function AuthScreen() {
             isOrg: true,
           })
         );
-        router.push("/(tabs)/home");
+        router.push("/(tabs)/");
       })
       .catch((error) => {
+        console.log(JSON.stringify(error, null, 2));
         if (error.response !== undefined) {
           alert(error.response.data.message);
         } else if (error.message == "Network Error") {
@@ -149,102 +151,110 @@ export default function AuthScreen() {
   };
 
   return (
-    <ScrollView className="p-5">
-      <Image
-        source={require("../assets/images/logindesign.png")}
-        style={{
-          width: width * 0.5,
-          height: height * 0.45,
-          alignSelf: "center",
-        }}
-        resizeMode="stretch"
-      />
-      <View className="p-5">
-        <Text className="font-semibold text-xl">
-          <Text className="text-green-700 text-2xl font-bold">
-            👋 Here You Can Easily
-          </Text>{" "}
-          Get and Return The Stocks Available In The Store{" "}
-          <Text className="text-green-700 text-2xl font-bold">
-            Whenever You Needs It.
-          </Text>
-        </Text>
-      </View>
-      <View style={styles.container}>
-        {/* <Text style={styles.title}>Login</Text> */}
-        <View style={{ flexDirection: "row", gap: 5 }}>
-          <Checkbox
-            status={isOrg ? "checked" : "unchecked"}
-            onPress={setOrgSelection}
+    <>
+      {loading ? (
+        <ActivityIndicator size="large" color="black" />
+      ) : (
+        <ScrollView className="p-5">
+          <Image
+            source={require("../assets/images/logindesign.png")}
+            style={{
+              width: width * 0.5,
+              height: height * 0.45,
+              alignSelf: "center",
+            }}
+            resizeMode="stretch"
           />
-          <Text style={{ fontSize: 20, fontweight: 500 }}>Org</Text>
-          <Checkbox
-            status={isUser ? "checked" : "unchecked"}
-            onPress={setUserSelection}
-          />
-          <Text style={{ fontSize: 20, fontweight: 500, textAlign: "center" }}>
-            User
-          </Text>
-        </View>
-        {/* Email Field */}
-        <Controller
-          control={control}
-          name="email"
-          rules={{ required: "Email is required" }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              onChangeText={onChange}
-              value={value}
+          <View className="p-5">
+            <Text className="font-semibold text-xl">
+              <Text className="text-green-700 text-2xl font-bold">
+                👋 Here You Can Easily
+              </Text>{" "}
+              Get and Return The Stocks Available In The Store{" "}
+              <Text className="text-green-700 text-2xl font-bold">
+                Whenever You Needs It.
+              </Text>
+            </Text>
+          </View>
+          <View style={styles.container}>
+            {/* <Text style={styles.title}>Login</Text> */}
+            <View style={{ flexDirection: "row", gap: 5 }}>
+              <Checkbox
+                status={isOrg ? "checked" : "unchecked"}
+                onPress={setOrgSelection}
+              />
+              <Text style={{ fontSize: 20, fontweight: 500 }}>Org</Text>
+              <Checkbox
+                status={isUser ? "checked" : "unchecked"}
+                onPress={setUserSelection}
+              />
+              <Text
+                style={{ fontSize: 20, fontweight: 500, textAlign: "center" }}
+              >
+                User
+              </Text>
+            </View>
+            {/* Email Field */}
+            <Controller
+              control={control}
+              name="email"
+              rules={{ required: "Email is required" }}
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  onChangeText={onChange}
+                  value={value}
+                />
+              )}
             />
-          )}
-        />
-        {errors.email && (
-          <Text style={styles.error}>{errors.email.message}</Text>
-        )}
-        {/* Password Field */}
-        <Controller
-          control={control}
-          name="password"
-          rules={{
-            required: "Password is required",
-            minLength: { value: 6, message: "Min 6 characters" },
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              secureTextEntry
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
-        />
-        {errors.password && (
-          <Text style={styles.error}>{errors.password.message}</Text>
-        )}
-        {/* Submit Button */}
-        {loading ? (
-          <ActivityIndicator size="large" color="#000" />
-        ) : (
-          <Pressable
-            style={styles.button}
-            onPress={handleSubmit(
-              isOrg
-                ? LoginOrg
-                : isUser
-                ? LoginUser
-                : alert("Please Select User/Org CheckBox")
+            {errors.email && (
+              <Text style={styles.error}>{errors.email.message}</Text>
             )}
-          >
-            <Text className="font-bold text-xl">Login</Text>
-          </Pressable>
-        )}
-      </View>
-    </ScrollView>
+            {/* Password Field */}
+            <Controller
+              control={control}
+              name="password"
+              rules={{
+                required: "Password is required",
+                minLength: { value: 6, message: "Min 6 characters" },
+              }}
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  secureTextEntry
+                  onChangeText={onChange}
+                  value={value}
+                />
+              )}
+            />
+            {errors.password && (
+              <Text style={styles.error}>{errors.password.message}</Text>
+            )}
+            {/* Submit Button */}
+            {loading ? (
+              <ActivityIndicator size="large" color="#000" />
+            ) : (
+              <Pressable
+                style={styles.button}
+                onPress={handleSubmit(
+                  isOrg
+                    ? LoginOrg
+                    : isUser
+                    ? LoginUser
+                    : alert("Please Select User/Org CheckBox")
+                )}
+              >
+                <Text className="font-bold text-xl">Login</Text>
+              </Pressable>
+            )}
+          </View>
+        </ScrollView>
+      )}
+    </>
   );
 }
 

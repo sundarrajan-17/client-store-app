@@ -43,7 +43,16 @@ const ProductCard = ({ product, count, increment, decrement }) => {
       <View style={styles.details}>
         <Text style={[styles.name, styles.textStyle]}>{product.name}</Text>
         <Text style={[styles.info, styles.textStyle]}>
-          Available: {product.quantity}
+          Available:{" "}
+          {product.quantity === 0 ? (
+            <Text style={[styles.outofstock, styles.textStyle]}>
+              Out Of Stock
+            </Text>
+          ) : (
+            <Text style={[styles.info, styles.textStyle]}>
+              {product.quantity}
+            </Text>
+          )}
         </Text>
         <Text style={[styles.info, styles.textStyle]}>
           Category: {product.category}
@@ -54,31 +63,37 @@ const ProductCard = ({ product, count, increment, decrement }) => {
           </Text>
         )}
       </View>
-      {count === 0 ? (
-        // Add Button
-        <Pressable
-          style={[styles.addButton]}
-          onPress={() => increment(product)}
-        >
-          <Text style={styles.addButtonText}>Add</Text>
-        </Pressable>
+      {product.quantity === 0 ? (
+        <></>
       ) : (
-        // Counter Buttons
-        <View style={styles.counterContainer}>
-          <Pressable
-            onPress={() => decrement(product)}
-            style={styles.counterButton}
-          >
-            <Text style={styles.counterText}>-</Text>
-          </Pressable>
-          <Text style={[styles.counterText]}>{count}</Text>
-          <Pressable
-            onPress={() => increment(product)}
-            style={styles.counterButton}
-          >
-            <Text style={styles.counterText}>+</Text>
-          </Pressable>
-        </View>
+        <>
+          {count === 0 ? (
+            // Add Button
+            <Pressable
+              style={[styles.addButton]}
+              onPress={() => increment(product)}
+            >
+              <Text style={styles.addButtonText}>Add</Text>
+            </Pressable>
+          ) : (
+            // Counter Buttons
+            <View style={styles.counterContainer}>
+              <Pressable
+                onPress={() => decrement(product)}
+                style={styles.counterButton}
+              >
+                <Text style={styles.counterText}>-</Text>
+              </Pressable>
+              <Text style={[styles.counterText]}>{count}</Text>
+              <Pressable
+                onPress={() => increment(product)}
+                style={styles.counterButton}
+              >
+                <Text style={styles.counterText}>+</Text>
+              </Pressable>
+            </View>
+          )}
+        </>
       )}
     </Pressable>
   );
@@ -144,11 +159,11 @@ const Products = ({ route }) => {
         if (errorReceived === "No token provided.") alert("Please LogIn First");
         else alert(error);
       } else if (error.message == "Network Error") {
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
         alert("Server Issue Please Try After Some Time");
         setLoading(false);
       } else {
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
         alert(error);
         setLoading(false);
       }
@@ -175,7 +190,7 @@ const Products = ({ route }) => {
       )
       .then((response) => {
         console.log(response.data);
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
       })
       .catch((error) => {
         console.log(error);
@@ -284,6 +299,11 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: "white",
     fontWeight: "bold",
+  },
+  outofstock: {
+    color: "#ff0000",
+    fontSize: 17,
+    fontWeight: "semibold",
   },
   counterContainer: {
     flexDirection: "row",

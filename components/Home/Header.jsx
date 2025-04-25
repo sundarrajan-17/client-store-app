@@ -27,7 +27,8 @@ export default function Header() {
           <View className="flex flex-row items-center gap-8">
             <Image
               source={require("../../assets/images/poster.jpg")}
-              style={{ width: 100, height: 100 }}
+              // style={{ width: 100, height: 100 }}
+              className="w-16 h-16"
             />
             <View className="gap-3">
               <Text className="font-bold text-3xl ">Welcome</Text>

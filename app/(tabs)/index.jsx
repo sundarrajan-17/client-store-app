@@ -8,7 +8,7 @@ import HistoryProducts from "../../components/Home/HistoryProducts";
 import Category from "../../components/Home/Category";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function home() {
+const Home = () => {
   const dispatch = useDispatch();
 
   const getData = async () => {
@@ -32,6 +32,7 @@ export default function home() {
   useEffect(() => {
     // getData();
   }, []);
+
   return (
     <ScrollView>
       {/* Header */}
@@ -44,4 +45,6 @@ export default function home() {
       <HistoryProducts />
     </ScrollView>
   );
-}
+};
+
+export default Home;

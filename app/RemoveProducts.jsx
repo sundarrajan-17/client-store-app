@@ -69,12 +69,12 @@ const RemoveProducts = () => {
       .then((response) => {
         console.log(response);
         alert("Product Deleted Successfully");
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
       })
       .catch((error) => {
         console.log(error);
         alert(error);
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
       });
   };
 
@@ -100,11 +100,11 @@ const RemoveProducts = () => {
         if (errorReceived === "No token provided.") alert("Please LogIn First");
         else alert(error);
       } else if (error.message == "Network Error") {
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
         alert("Server Issue Please Try After Some Time");
         setLoading(false);
       } else {
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
         alert(error);
         setLoading(false);
       }

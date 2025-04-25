@@ -34,28 +34,27 @@ export default function HistoryProducts() {
       setLoading(true);
       const bearerToken = token;
       const response = await axios.get(
-        `https://store-app-vykv.onrender.com/request/orghistory/`,
+        `https://store-app-vykv.onrender.com/request/orghistory`,
         {
           headers: {
             Authorization: `Bearer ${bearerToken}`,
           },
         }
       );
-      console.log(response.data.history);
       setProducts(response.data.history);
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      console.log(error?.response);
       if (error.response !== undefined) {
         const errorReceived = error.response.data.message;
         if (errorReceived === "No token provided.") alert("Please LogIn First");
         else alert(error);
       } else if (error.message == "Network Error") {
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
         alert("Server Issue Please Try After Some Time");
         setLoading(false);
       } else {
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
         alert(error);
         setLoading(false);
       }
@@ -67,7 +66,7 @@ export default function HistoryProducts() {
   }, []);
 
   const ListHeader = () => {
-    console.log(products);
+    // console.log(products);
     return (
       <View className="flex flex-row items-center justify-between p-2">
         <Text className="text-xl font-semibold">Product History</Text>
@@ -80,44 +79,54 @@ export default function HistoryProducts() {
       {loading ? (
         <Text className="text-xl font-bold">Loading Products........</Text>
       ) : (
-        <FlatList
-          data={products}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => {
-            return (
-              <Card className="rounded-2xl min-w-2">
-                {/* <Card.Title title={item.userId} titleVariant="labelLarge" /> */}
-                <Card.Content style={{ gap: 5, backgroundColor: "#E4EFE7" }}>
-                  <View className="flex flex-row items-center justify-between">
-                    <View>
-                      <Text>{item.userId.username}</Text>
-                    </View>
-                    <View>
-                      <Pressable onPress={() => console.log("pressed")}>
-                        <Text>View</Text>
-                      </Pressable>
-                    </View>
-                  </View>
-                  <View className="flex flex-row items-center justify-between">
-                    <Text>{item.productId.name}</Text>
-                    <Text className="text-slate-800">
-                      {item.productId.quantity}
-                    </Text>
-                  </View>
-                </Card.Content>
-              </Card>
-            );
-          }}
-          scrollEnabled={false}
-          contentContainerStyle={{
-            //   display: "flex",
-            //   flexDirection: "row",
-            //   flexWrap: "wrap",
-            gap: 15,
-            margin: 10,
-          }}
-          ListHeaderComponent={ListHeader}
-        />
+        <>
+          {products?.length === 0 ? (
+            <Text className="text-xl font-bold ml-3">
+              No Organisation History Available.
+            </Text>
+          ) : (
+            <FlatList
+              data={products}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => {
+                return (
+                  <Card className="rounded-2xl min-w-2">
+                    {/* <Card.Title title={item.userId} titleVariant="labelLarge" /> */}
+                    <Card.Content
+                      style={{ gap: 5, backgroundColor: "#E4EFE7" }}
+                    >
+                      <View className="flex flex-row items-center justify-between">
+                        <View>
+                          <Text>{item.userId.username}</Text>
+                        </View>
+                        <View>
+                          <Pressable onPress={() => console.log("pressed")}>
+                            <Text>View</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                      <View className="flex flex-row items-center justify-between">
+                        <Text>{item.productId.name}</Text>
+                        <Text className="text-slate-800">
+                          {item.productId.quantity}
+                        </Text>
+                      </View>
+                    </Card.Content>
+                  </Card>
+                );
+              }}
+              scrollEnabled={false}
+              contentContainerStyle={{
+                //   display: "flex",
+                //   flexDirection: "row",
+                //   flexWrap: "wrap",
+                gap: 15,
+                margin: 10,
+              }}
+              ListHeaderComponent={ListHeader}
+            />
+          )}
+        </>
       )}
     </View>
   );

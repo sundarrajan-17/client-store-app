@@ -155,11 +155,11 @@ const Products = () => {
         if (errorReceived === "No token provided.") alert("Please LogIn First");
         else alert(error);
       } else if (error.message == "Network Error") {
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
         alert("Server Issue Please Try After Some Time");
         setLoading(false);
       } else {
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/");
         alert(error);
         setLoading(false);
       }
@@ -182,7 +182,7 @@ const Products = () => {
       })
       .then((response) => {
         console.log(response.data);
-        router.push("/(tabs)/home");
+        router.push("/(tabs)/");
       })
       .catch((error) => {
         console.log(error);
@@ -217,11 +217,11 @@ const Products = () => {
             alert("Please LogIn First");
           else alert(error);
         } else if (error.message == "Network Error") {
-          router.replace("/(tabs)/home");
+          router.replace("/(tabs)/");
           alert("Server Issue Please Try After Some Time");
           setSubmit(false);
         } else {
-          router.replace("/(tabs)/home");
+          router.replace("/(tabs)/");
           alert(error);
           setSubmit(false);
         }
